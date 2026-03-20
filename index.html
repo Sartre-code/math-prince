@@ -7,35 +7,57 @@
 
 <style>
 body{
-  font-family:Arial;
-  background:#0f172a;
+  font-family: Arial;
+  background:#0b132b;
   color:white;
   margin:0;
-  padding:16px;
+  padding:20px;
 }
+
+h1{
+  text-align:center;
+  margin-bottom:20px;
+}
+
 .card{
-  background:#1e293b;
-  padding:16px;
-  border-radius:12px;
+  background:#1c2541;
+  padding:20px;
+  border-radius:16px;
   margin-bottom:16px;
+}
+
+.button{
+  background:linear-gradient(90deg,#5f6af2,#7b5cff);
+  padding:14px;
+  border-radius:12px;
+  text-align:center;
+  margin-top:10px;
+  cursor:pointer;
+}
+
+.bar{
+  height:10px;
+  background:#3a506b;
+  border-radius:6px;
+  margin-top:6px;
+}
+.bar-inner{
+  height:10px;
+  background:#7b5cff;
+  border-radius:6px;
+  width:10%;
+}
+
+#game{display:none}
+input{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
 }
 button{
   padding:12px;
-  border:none;
-  border-radius:10px;
-  background:#6366f1;
-  color:white;
-  margin:6px 0;
-  width:100%;
-  font-size:16px;
-}
-input{
-  padding:12px;
-  width:100%;
   margin-top:10px;
-  font-size:16px;
 }
-.small{font-size:14px;color:#cbd5f5}
 </style>
 </head>
 
@@ -43,29 +65,58 @@ input{
 
 <h1>數學王子的覺醒</h1>
 
-<div id="home" class="card">
-<h2>選擇單元</h2>
+<div id="home">
 
-<button onclick="start('fraction')">分數之域</button>
-<button onclick="start('percentage')">百分率之域</button>
-<button onclick="start('speed')">速率之域</button>
-<button onclick="start('ratio')">比例與體積</button>
-<button onclick="start('circle')">圓</button>
-<button onclick="start('average')">平均數</button>
-<button onclick="start('data')">資料圖表</button>
-<button onclick="start('algebra')">代數</button>
-
-<button onclick="reviewWrong()">錯題複習</button>
+<div class="card">
+<h2>覺醒進度：0 / 60</h2>
 </div>
 
-<div id="game" class="card" style="display:none;">
+<div class="card">
+<h3>技能成長</h3>
+Reasoning
+<div class="bar"><div class="bar-inner"></div></div>
+Accuracy
+<div class="bar"><div class="bar-inner"></div></div>
+Persistence
+<div class="bar"><div class="bar-inner"></div></div>
+</div>
+
+<div class="card">
+<h3>分數之域</h3>
+<div class="button" onclick="start('fraction')">開始</div>
+</div>
+
+<div class="card">
+<h3>百分率之域</h3>
+<div class="button" onclick="start('percentage')">開始</div>
+</div>
+
+<div class="card">
+<h3>速率之域</h3>
+<div class="button" onclick="start('speed')">開始</div>
+</div>
+
+<div class="card">
+<h3>代數之域</h3>
+<div class="button" onclick="start('algebra')">開始</div>
+</div>
+
+<div class="card">
+<div class="button" onclick="reviewWrong()">錯題複習</div>
+</div>
+
+</div>
+
+<div id="game" class="card">
 <h2 id="q"></h2>
+
 <input id="answer" placeholder="輸入答案">
-<button onclick="submit()">提交答案</button>
+
+<button onclick="submit()">提交</button>
 <button onclick="next()">下一題</button>
 
 <p id="result"></p>
-<p id="explain" class="small"></p>
+<p id="explain"></p>
 </div>
 
 <script>
@@ -74,13 +125,19 @@ let current=0
 let list=[]
 let wrong=[]
 
-function normalize(v){
-return v.replace(/\s/g,'').toLowerCase()
-}
-
-function checkAnswer(val,answers){
-val=normalize(val)
-return answers.map(normalize).includes(val)
+const qbank={
+fraction:[
+{q:"媽媽做蛋糕切成8份，吃3/8與1/4，共吃多少?",a:["5/8","0.625"],e:"通分"},
+],
+percentage:[
+{q:"原價200打8折多少?",a:["160"],e:"×0.8"},
+],
+speed:[
+{q:"距離120km用2小時，速率?",a:["60"],e:"除"},
+],
+algebra:[
+{q:"金幣花一半再花30剩50，原本金幣?",a:["160"],e:"設x"},
+]
 }
 
 function start(type){
@@ -98,10 +155,15 @@ result.innerText=""
 explain.innerText=""
 }
 
-function submit(){
-let val=answer.value
+function normalize(v){
+return v.replace(/\s/g,'').toLowerCase()
+}
 
-if(checkAnswer(val,list[current].a)){
+function submit(){
+let val=normalize(answer.value)
+let correct=list[current].a.map(normalize)
+
+if(correct.includes(val)){
 result.innerText="✅ 正確"
 }else{
 result.innerText="❌ 錯誤"
@@ -113,13 +175,13 @@ wrong.push(list[current])
 function next(){
 current++
 if(current>=list.length){
-alert("完成本單元")
+alert("完成")
 location.reload()
 }else show()
 }
 
 function reviewWrong(){
-if(wrong.length===0){
+if(wrong.length==0){
 alert("目前沒有錯題")
 return
 }
@@ -128,76 +190,6 @@ current=0
 home.style.display="none"
 game.style.display="block"
 show()
-}
-
-/* ===== 題庫（40題）===== */
-
-const qbank={
-
-fraction:[
-{q:"1/2+1/3=?",a:["5/6","0.833"],e:"通分後相加"},
-{q:"1-2/5=?",a:["3/5"],e:"1-2/5"},
-{q:"2/3×3=?",a:["2"],e:"約分"},
-{q:"3/4=0.75?",a:["是","yes"],e:"轉換"},
-{q:"蛋糕剩1/4吃1/8後剩?",a:["1/8"],e:"相減"}
-],
-
-percentage:[
-{q:"200打9折?",a:["180"],e:"×0.9"},
-{q:"50增加20%?",a:["60"],e:"×1.2"},
-{q:"80是100幾%?",a:["80%","0.8"],e:"比例"},
-{q:"100降20%?",a:["80"],e:"減少"},
-{q:"先-10%再+10%?",a:["99"],e:"非回原"}
-],
-
-speed:[
-{q:"60km/2h=?",a:["30"],e:"除"},
-{q:"90km/3h=?",a:["30"],e:"同"},
-{q:"120km/2h=?",a:["60"],e:"同"},
-{q:"距離=速率×時間?",a:["是"],e:"公式"},
-{q:"火車2hr120km?",a:["60"],e:"計算"}
-],
-
-ratio:[
-{q:"比例2:3總50?",a:["20","30"],e:"分配"},
-{q:"體積2×3×4?",a:["24"],e:"公式"},
-{q:"1:1=2:2?",a:["是"],e:"等價"},
-{q:"5:10=?",a:["1:2"],e:"約分"},
-{q:"比例分100成2:3?",a:["40","60"],e:"分配"}
-],
-
-circle:[
-{q:"直徑10周長?",a:["31.4"],e:"πd"},
-{q:"半徑5周長?",a:["31.4"],e:"2πr"},
-{q:"半徑×2周長?",a:["2倍"],e:"比例"},
-{q:"圓周公式?",a:["2πr"],e:"記憶"},
-{q:"直徑14周長?",a:["44"],e:"22/7"}
-],
-
-average:[
-{q:"(10+20+30)/3=?",a:["20"],e:"平均"},
-{q:"5人平均80總?",a:["400"],e:"×"},
-{q:"總100平均5?",a:["20"],e:"除"},
-{q:"平均×人數=?",a:["總和"],e:"反推"},
-{q:"增加一人平均變?",a:["需重算"],e:"概念"}
-],
-
-data:[
-{q:"銷量80,100,120平均?",a:["100"],e:"平均"},
-{q:"70,80,90最大?",a:["90"],e:"判讀"},
-{q:"10→20→30增加最大?",a:["20"],e:"差值"},
-{q:"20占100幾%?",a:["20%","0.2"],e:"比例"},
-{q:"圖表題重點?",a:["看數據"],e:"閱讀"}
-],
-
-algebra:[
-{q:"2x+10=50?",a:["20"],e:"解"},
-{q:"x/2=40?",a:["80"],e:"乘"},
-{q:"x+30=100?",a:["70"],e:"減"},
-{q:"3x=90?",a:["30"],e:"除"},
-{q:"x-20=10?",a:["30"],e:"加"}
-]
-
 }
 
 </script>
