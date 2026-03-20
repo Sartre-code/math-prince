@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>數學王子的覺醒｜40題測試版</title>
+<style>
+:root{--bg:#f3f5fb;--card:#ffffff;--ink:#1f2a44;--muted:#6b7280;--line:#dde3f0;--accent:#6d5efc;--accent2:#8b7cff;--ok:#157347;--bad:#b42318;}
+*{box-sizing:border-box} body{margin:0;font-family:"Noto Sans TC",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.container{max-width:1100px;margin:0 auto;padding:20px}
+.hero,.card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 8px 24px rgba(31,42,68,.05)}
+.hero{padding:24px;margin-bottom:20px}.hero h1{margin:0 0 8px;font-size:34px}.hero p{margin:6px 0;color:var(--muted);line-height:1.7}
+.grid{display:grid;gap:16px}.stats{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:18px}.units{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{padding:18px}.label{font-size:14px;color:var(--muted)} .big{font-size:22px;font-weight:800;margin:6px 0}
+.progress{height:12px;background:#edf1fb;border-radius:999px;overflow:hidden}.bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%}
+.unit-title{font-size:26px;font-weight:800;margin:0 0 4px}.unit-sub{color:var(--muted);min-height:46px;line-height:1.6}
+.unit-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin:10px 0 12px}
+.actions{display:flex;flex-wrap:wrap;gap:10px}.btn{border:none;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer}.btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:white}.btn.secondary{background:#eef2ff;color:var(--accent)}.btn.ghost{background:white;border:1px solid var(--line);color:var(--ink)} .btn:disabled{opacity:.45;cursor:not-allowed}
+.hidden{display:none !important}
+.question-card{padding:22px}.crumb{font-size:14px;color:var(--muted);margin-bottom:10px}.qtext{font-size:28px;font-weight:800;line-height:1.5;margin:0 0 16px}
+.qbody{font-size:20px;line-height:1.9;white-space:pre-line;margin-bottom:16px}.input{width:100%;padding:14px 16px;border:1px solid var(--line);border-radius:14px;font-size:18px}
+.feedback{margin-top:14px;padding:14px;border-radius:14px;border:1px solid var(--line)}.ok{background:#eefaf3;color:var(--ok);border-color:#c9e7d5}.bad{background:#fff2f1;color:var(--bad);border-color:#f0c9c5}
+.explain{margin-top:10px;background:#f8faff;border:1px solid var(--line);padding:14px;border-radius:14px;white-space:pre-line;line-height:1.8}.wrong-list{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}.pill{border:1px solid var(--line);background:#fff;padding:8px 10px;border-radius:999px;cursor:pointer}
+.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}.mini{font-size:13px;color:var(--muted)}
+@media (max-width:800px){.stats,.units{grid-template-columns:1fr}.hero h1{font-size:28px}.qtext{font-size:22px}.qbody{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <section class="hero">
+    <h1>The Awakening of the Mathematical Prince</h1>
+    <p><strong>數學王子的覺醒</strong></p>
+    <p>這是六年級數學 40 題校內測試版。先建立信心，再逐步進入挑戰題。答錯後可立刻看詳解，並回到原本進度繼續。</p>
+  </section>
+
+  <section id="homeView">
+    <div class="grid stats">
+      <div class="card">
+        <div class="label">覺醒進度</div>
+        <div class="big" id="stageText">Dormant｜沉睡</div>
+        <div class="mini"><span id="completedCount">0</span> / 40 題完成</div>
+      </div>
+      <div class="card">
+        <div class="label">學習成長</div>
+        <div class="mini">持續力</div><div class="progress"><div class="bar" id="barPersistence"></div></div>
+        <div class="mini" style="margin-top:10px">精準力</div><div class="progress"><div class="bar" id="barAccuracy"></div></div>
+      </div>
+    </div>
+
+    <div class="grid units" id="unitGrid"></div>
+  </section>
+
+  <section id="questionView" class="card question-card hidden">
+    <div class="topbar">
+      <div>
+        <div class="crumb" id="crumb"></div>
+        <div class="qtext" id="qTitle"></div>
+      </div>
+      <button class="btn ghost" id="backHomeBtn">回首頁</button>
+    </div>
+    <div class="qbody" id="qBody"></div>
+    <div class="label">你的答案</div>
+    <input class="input" id="answerInput" placeholder="可輸入分數、小數、文字或多個答案" />
+    <div class="actions" style="margin-top:12px">
+      <button class="btn primary" id="submitBtn">提交答案</button>
+      <button class="btn secondary" id="nextBtn">下一題</button>
+    </div>
+    <div id="feedbackWrap"></div>
+    <div class="card" style="margin-top:16px;padding:14px">
+      <div class="label">本單元錯題整理</div>
+      <div class="wrong-list" id="wrongList"></div>
+    </div>
+  </section>
+</div>
+<script>
+const units = {
+  fraction:{title:'分數之域', subtitle:'理解部分與整體、剩餘量與逆推。'},
+  percentage:{title:'百分率之域', subtitle:'掌握折扣、增加、減少與逆推。'},
+  speed:{title:'速率之域', subtitle:'理解時間、距離、速度與交通情境。'},
+  ratioVolume:{title:'比例與體積之域', subtitle:'在配方、比例與容量中做多步推理。'},
+  circle:{title:'圓之域', subtitle:'理解半徑、直徑與圓周長應用。'},
+  average:{title:'平均數之域', subtitle:'在生活情境中反推平均與總量。'},
+  data:{title:'資料圖表之域', subtitle:'看懂表格資料，再比較、判讀與計算。'},
+  algebra:{title:'代數之域', subtitle:'用未知數理解情境，而不是只解 x。'}
+};
+
+const allQuestions = {
+  fraction:[
+    {id:'F1', concept:'fraction_add', level:'L2', title:'F1', body:'媽媽做了一個蛋糕，切成 8 等份。\n爸爸吃了 3/8，姐姐吃了 1/4。\n\n請問全家一共吃了多少蛋糕？', answer:{type:'numeric', value:0.625, forms:['5/8']}, explanation:'1/4 = 2/8。\n3/8 + 2/8 = 5/8，所以一共吃了 5/8。'},
+    {id:'F2', concept:'fraction_remaining', level:'L3', title:'F2', body:'一桶果汁先喝掉整桶的 2/5，之後又喝掉剩下的一半。\n\n請問最後還剩整桶的幾分之幾？', answer:{type:'numeric', value:0.3, forms:['3/10']}, explanation:'先喝掉 2/5，剩下 3/5。\n再喝掉剩下的一半，也就是喝掉 3/10。\n所以最後剩下 3/5 - 3/10 = 3/10。'},
+    {id:'F3', concept:'fraction_reverse', level:'L3', title:'F3', body:'小包一家人平常一年吃 60 公斤米。\n今年前三個月就吃掉了平常一年米量的 1/3。\n如果接下來每三個月都維持同樣用量，\n今年一年大約需要多少公斤米？', answer:{type:'numeric', value:80}, explanation:'平常一年量的 1/3 = 60 × 1/3 = 20 公斤。\n3 個月吃 20 公斤，12 個月就是 4 倍。\n20 × 4 = 80 公斤。'},
+    {id:'F4', concept:'fraction_weight', level:'L2', title:'F4', body:'做水果拼盤用了 1/4 個西瓜和 1/3 個哈密瓜。\n已知一個西瓜重 4 公斤，一個哈密瓜重 3 公斤。\n\n請問一共用了多少公斤水果？', answer:{type:'numeric', value:2}, explanation:'西瓜：4 × 1/4 = 1 公斤。\n哈密瓜：3 × 1/3 = 1 公斤。\n總共 2 公斤。'},
+    {id:'F5', concept:'fraction_today', level:'L2', title:'F5', body:'全班掃地區域已完成 3/4。\n今天又完成了剩下部分的一半。\n\n請問今天完成了全部的幾分之幾？', answer:{type:'numeric', value:0.125, forms:['1/8']}, explanation:'剩下 1/4。\n今天完成剩下一半，就是 1/4 × 1/2 = 1/8。'}
+  ],
+  percentage:[
+    {id:'P1', concept:'discount_double', level:'L2', title:'P1', body:'一件外套原價 2000 元。\n周年慶先打 8 折，會員再享 9 折。\n\n請問最後要付多少元？', answer:{type:'numeric', value:1440}, explanation:'先打 8 折：2000 × 0.8 = 1600。\n再打 9 折：1600 × 0.9 = 1440。'},
+    {id:'P2', concept:'discount_reverse', level:'L3', title:'P2', body:'一件衣服打 8 折後賣 960 元。\n\n請問原價是多少元？', answer:{type:'numeric', value:1200}, explanation:'售價 = 原價 × 0.8。\n所以原價 = 960 ÷ 0.8 = 1200。'},
+    {id:'P3', concept:'increase', level:'L2', title:'P3', body:'去年夏天電費是 3200 元。\n今年因為冷氣使用增加，電費增加 15%。\n\n請問今年電費是多少元？', answer:{type:'numeric', value:3680}, explanation:'增加金額 = 3200 × 0.15 = 480。\n今年電費 = 3200 + 480 = 3680。'},
+    {id:'P4', concept:'decrease_increase', level:'L3', title:'P4', body:'某商品原價 800 元。\n先降價 25%，之後又上漲 25%。\n\n請問現在價格是多少元？', answer:{type:'numeric', value:750}, explanation:'先降價：800 × 0.75 = 600。\n再上漲：600 × 1.25 = 750。'},
+    {id:'P5', concept:'attendance', level:'L1', title:'P5', body:'班上共有 40 人，今天有 36 人到校。\n\n請問今天出席率是多少？', answer:{type:'numeric', value:90, forms:['90%']}, explanation:'36 ÷ 40 = 0.9 = 90%。'}
+  ],
+  speed:[
+    {id:'S1', concept:'basic_speed', level:'L1', title:'S1', body:'小明搭捷運上學，平均速度是 40 km/h。\n家到學校距離是 20 公里。\n\n請問需要多少分鐘？', answer:{type:'numeric', value:30}, explanation:'時間 = 20 ÷ 40 = 0.5 小時 = 30 分鐘。'},
+    {id:'S2', concept:'time_hours', level:'L2', title:'S2', body:'小華搭台鐵從台中到嘉義，距離 90 公里，平均速度 60 km/h。\n\n請問需要多少小時？', answer:{type:'numeric', value:1.5, forms:['1 1/2','3/2','1.5小時','1 1/2小時']}, explanation:'時間 = 90 ÷ 60 = 1.5 小時，也就是 1 1/2 小時。'},
+    {id:'S3', concept:'time_difference', level:'L2', title:'S3', body:'小明搭捷運，速度 40 km/h；小華搭公車，速度 30 km/h。\n兩人都要走 20 公里。\n\n請問兩人的到達時間相差多少分鐘？', answer:{type:'numeric', value:10, forms:['10分鐘']}, explanation:'小明：20 ÷ 40 = 1/2 小時 = 30 分鐘。\n小華：20 ÷ 30 = 2/3 小時 = 40 分鐘。\n相差 10 分鐘。'},
+    {id:'S4', concept:'bike_distance', level:'L2', title:'S4', body:'小華騎腳踏車，速度是 12 km/h。\n他騎了 45 分鐘。\n\n請問騎了多少公里？', answer:{type:'numeric', value:9}, explanation:'45 分鐘 = 0.75 小時。\n距離 = 12 × 0.75 = 9 公里。'},
+    {id:'S5', concept:'segment_time', level:'L3', title:'S5', body:'小明搭捷運先走 10 公里，再轉乘走 6 公里，平均速度都以 40 km/h 計。\n\n請問整趟車程需要多少分鐘？', answer:{type:'numeric', value:24}, explanation:'總距離 = 10 + 6 = 16 公里。\n時間 = 16 ÷ 40 = 0.4 小時 = 24 分鐘。'}
+  ],
+  ratioVolume:[
+    {id:'R1', concept:'ratio_difference', level:'L3', title:'R1', body:'一杯飲料中果汁與水的比例是 2：5。\n已知水比果汁多 210 毫升。\n\n請問這杯飲料總共有多少毫升？', answer:{type:'numeric', value:490}, explanation:'水比果汁多 3 份。\n3 份 = 210，所以 1 份 = 70。\n總共 7 份 = 490 毫升。'},
+    {id:'R2', concept:'ratio_people', level:'L3', title:'R2', body:'某班男生與女生比例為 3：2。\n若有 3 位男生轉走後，男女比例變成 1：1。\n\n請問原本全班共有多少人？', answer:{type:'numeric', value:15}, explanation:'設男生 3x、女生 2x。\n3x - 3 = 2x，所以 x = 3。\n原本總人數 = 5x = 15。'},
+    {id:'R3', concept:'scale_map', level:'L2', title:'R3', body:'某地圖比例尺為 1：25000。\n地圖上兩地距離為 8 公分。\n\n請問實際距離是多少公尺？', answer:{type:'numeric', value:2000, forms:['2000公尺']}, explanation:'8 × 25000 = 200000 公分 = 2000 公尺。'},
+    {id:'V4', concept:'volume_basic', level:'L1', title:'V4', body:'一個長方體水箱長 50 公分、寬 40 公分、高 30 公分。\n如果裝滿水，請問水量是多少公升？', answer:{type:'numeric', value:60, forms:['60公升','60公升水']}, explanation:'體積 = 50 × 40 × 30 = 60000 cm³。\n1000 cm³ = 1 公升，所以是 60 公升。'},
+    {id:'V9', concept:'volume_partial', level:'L3', title:'V9', body:'A 容器中有 12000 cm³ 的水，B 容器中有 8000 cm³ 的水。\n先把 A 容器的水倒出 1/3，再把剩下的水和 B 容器的水全部倒入容量 18 公升的水箱。\n\n請問水箱還差多少公升才會滿？', answer:{type:'numeric', value:2, forms:['2公升']}, explanation:'A 剩下 12000 × 2/3 = 8000 cm³。\n總水量 = 8000 + 8000 = 16000 cm³ = 16 公升。\n18 - 16 = 2 公升。'}
+  ],
+  circle:[
+    {id:'C1', concept:'circumference_diameter', level:'L1', title:'C1', body:'一個圓形跑道的直徑是 14 公尺。\n小明繞一圈，大約跑了多少公尺？（π 取 22/7）', answer:{type:'numeric', value:44}, explanation:'周長 = 直徑 × π = 14 × 22/7 = 44。'},
+    {id:'C2', concept:'radius_from_circumference', level:'L2', title:'C2', body:'一個圓的周長是 62.8 公分。（π 取 3.14）\n\n請問半徑是多少公分？', answer:{type:'numeric', value:10}, explanation:'62.8 = 2 × 半徑 × 3.14。\n半徑 = 62.8 ÷ 6.28 = 10。'},
+    {id:'C4', concept:'difference_circumference', level:'L2', title:'C4', body:'兩個圓的半徑分別為 10 公分與 7 公分。\n（π 取 3.14）\n\n請問兩個圓的周長相差多少公分？', answer:{type:'numeric', value:18.84}, explanation:'大圓周長 = 2 × 10 × 3.14 = 62.8。\n小圓周長 = 2 × 7 × 3.14 = 43.96。\n相差 18.84。'},
+    {id:'C5', concept:'scaled_circumference', level:'L3', title:'C5', body:'一個圓的周長是 75.36 公分。（π 取 3.14）\n現在把半徑縮小為原來的 3/4。\n\n請問新的圓周長是多少公分？', answer:{type:'numeric', value:56.52}, explanation:'原半徑 = 75.36 ÷ 6.28 = 12。\n縮小後半徑 = 12 × 3/4 = 9。\n新周長 = 2 × 9 × 3.14 = 56.52。'},
+    {id:'C10', concept:'increase_radius', level:'L3', title:'C10', body:'某圓的周長是 94.2 公分。（π 取 3.14）\n如果半徑增加 5 公分，新的周長是多少？', answer:{type:'numeric', value:125.6}, explanation:'原半徑 = 94.2 ÷ 6.28 = 15。\n新半徑 = 20。\n新周長 = 2 × 20 × 3.14 = 125.6。'}
+  ],
+  average:[
+    {id:'A2', concept:'average_correction', level:'L3', title:'A2', body:'小明 5 天搭捷運上學，平均通勤時間是 18 分鐘。\n其中 4 天分別是 15、20、17、19 分鐘。\n但其中一天因誤點多花了 4 分鐘。\n\n請問修正後平均是多少分鐘？', answer:{type:'numeric', value:17.2}, explanation:'原總 = 18 × 5 = 90 分鐘。\n修正後總 = 90 - 4 = 86 分鐘。\n平均 = 86 ÷ 5 = 17.2 分鐘。'},
+    {id:'A3', concept:'average_game', level:'L2', title:'A3', body:'小華 4 天平均每天玩遊戲 50 分鐘。\n其中 2 天分別玩 40 與 70 分鐘，另外 1 天比平均少 10 分鐘。\n\n請問第 4 天玩了幾分鐘？', answer:{type:'numeric', value:50}, explanation:'總時間 = 4 × 50 = 200。\n已知 40 + 70 = 110。\n第三天 = 50 - 10 = 40。\n第四天 = 200 - 110 - 40 = 50。'},
+    {id:'A5', concept:'average_water', level:'L3', title:'A5', body:'某家庭 4 天平均每天用水 120 公升。\n其中 3 天用水量分別為 100、130、110 公升，且其中一天其實少記了 20 公升。\n\n請問修正後平均是多少公升？', answer:{type:'numeric', value:125}, explanation:'原總 = 4 × 120 = 480。\n修正後總 = 480 + 20 = 500。\n平均 = 500 ÷ 4 = 125。'},
+    {id:'A6', concept:'average_circle', level:'L3', title:'A6', body:'某球員在圓形跑道上練習跑步，跑道直徑為 28 公尺（π=22/7）。\n他 5 天平均每天跑 440 公尺。\n其中前 2 天各跑 4 圈，後 2 天各跑 5 圈。\n\n請問第 5 天跑了幾圈？', answer:{type:'numeric', value:7}, explanation:'一圈 = 28 × 22/7 = 88 公尺。\n5 天總距離 = 5 × 440 = 2200。\n前兩天 = 2 × 4 × 88 = 704。\n後兩天 = 2 × 5 × 88 = 880。\n第 5 天距離 = 2200 - 704 - 880 = 616。\n616 ÷ 88 = 7 圈。'},
+    {id:'A7', concept:'average_volume', level:'L3', title:'A7', body:'一個長方體水箱長 50 公分、寬 40 公分、高 30 公分。\n某家庭 5 天平均每天用水量等於水箱容量的 1/5。\n其中前 4 天每天分別用了 12000、10000、11000、15000 cm³ 的水。\n\n請問第 5 天用了多少 cm³？', answer:{type:'numeric', value:12000}, explanation:'水箱容量 = 50 × 40 × 30 = 60000 cm³。\n平均每天 = 60000 ÷ 5 = 12000 cm³。\n5 天總量 = 12000 × 5 = 60000 cm³。\n前 4 天共 48000 cm³。\n第 5 天 = 60000 - 48000 = 12000 cm³。'}
+  ],
+  data:[
+    {id:'D1', concept:'bar_average', level:'L1', title:'D1', body:'某週飲料店銷量如下（杯）：\n星期一 80、星期二 120、星期三 100、星期四 140、星期五 160。\n\n請問這 5 天平均每天賣多少杯？', answer:{type:'numeric', value:120}, explanation:'總數 = 80 + 120 + 100 + 140 + 160 = 600。\n平均 = 600 ÷ 5 = 120。'},
+    {id:'D2', concept:'above_average', level:'L2', title:'D2', body:'延續上題資料。\n哪一天比平均多最多？多多少杯？', answer:{type:'set', values:['星期五','40'], aliases:[['五','40'],['星期五','40杯'],['五','40杯']]}, explanation:'平均是 120。\n星期五 160，比平均多 40，最多。\n可回答：星期五，40 杯。'},
+    {id:'D3', concept:'trend_multi', level:'L3', title:'D3', body:'某學生一週讀書時間如下（小時）：\n星期一 2、星期二 3、星期三 5、星期四 4、星期五 6。\n\n請問哪一天「增加最多」？', answer:{type:'multiDays', values:['星期三','星期五']}, explanation:'2→3 增加 1。\n3→5 增加 2。\n5→4 減少 1。\n4→6 增加 2。\n所以增加最多的是星期三與星期五。'},
+    {id:'D4', concept:'fifth_score', level:'L2', title:'D4', body:'某班 4 次測驗分數為 70、80、90、60。\n如果第 5 次測驗希望平均達到 80 分，\n\n第 5 次要考幾分？', answer:{type:'numeric', value:100}, explanation:'5 次總分要有 80 × 5 = 400。\n前 4 次共 300。\n所以第 5 次要 100 分。'},
+    {id:'D5', concept:'bus_percent', level:'L2', title:'D5', body:'某班交通方式：走路 6 人、公車 9 人、腳踏車 5 人。\n\n請問搭公車的人數占全部的百分比是多少？', answer:{type:'numeric', value:45, forms:['45%','0.45']}, explanation:'總人數 = 6 + 9 + 5 = 20。\n9 ÷ 20 = 0.45 = 45%。'}
+  ],
+  algebra:[
+    {id:'E1', concept:'price_relation', level:'L2', title:'E1', body:'小明買了 3 支筆和 2 本筆記本，共花 140 元。\n已知一本筆記本比一支筆貴 10 元。\n\n請問一支筆多少元？', answer:{type:'numeric', value:24}, explanation:'設筆 x 元，筆記本 x+10 元。\n3x + 2(x+10) = 140\n5x + 20 = 140\n5x = 120\nx = 24。'},
+    {id:'E3', concept:'game_xp', level:'L2', title:'E3', body:'某遊戲角色目前經驗值為 x。\n如果完成任務後，經驗值先增加 50%，再加 30 點，總經驗會變成 180 點。\n\n請問原本經驗值是多少？', answer:{type:'numeric', value:100}, explanation:'1.5x + 30 = 180\n1.5x = 150\nx = 100。'},
+    {id:'E5', concept:'power_up', level:'L3', title:'E5', body:'某動畫角色原本攻擊力為 x。\n經過兩次強化：第一次提升 20%，第二次再增加 15 點，最後攻擊力變成 135。\n\n請問原本攻擊力是多少？', answer:{type:'numeric', value:100}, explanation:'1.2x + 15 = 135\n1.2x = 120\nx = 100。'},
+    {id:'E6', concept:'circle_run', level:'L3', title:'E6', body:'某球員在圓形跑道上練習（每圈 88 公尺）。\n他原本跑了 x 圈，之後又多跑了原本圈數的一半，總距離變成 1056 公尺。\n\n請問原本跑了幾圈？', answer:{type:'numeric', value:8}, explanation:'總圈數 = x + x/2 = 3x/2。\n(3x/2) × 88 = 1056\n132x = 1056\nx = 8。'},
+    {id:'E7', concept:'coins', level:'L3', title:'E7', body:'某遊戲中，小明有 x 金幣。\n他先花掉 1/3 金幣，再花掉剩下的一半，最後還剩 40 金幣。\n\n請問原本金幣是多少？', answer:{type:'numeric', value:120}, explanation:'先花 1/3，剩 2/3x。\n再花剩下一半，最後剩 1/3x。\n1/3x = 40\nx = 120。'}
+  ]
+};
+
+let state = loadState();
+let currentUnit = null;
+let currentIndex = 0;
+let currentReviewMode = false;
+let reviewQueue = [];
+
+function defaultState(){
+  const progress = {}, wrong = {};
+  Object.keys(units).forEach(k=>{progress[k]=0; wrong[k]=[];});
+  return {progress, wrong, stats:{answered:0, correct:0}};
+}
+function loadState(){
+  try{ const raw = localStorage.getItem('mathPrinceTest40'); return raw ? JSON.parse(raw) : defaultState(); }catch(e){ return defaultState(); }
+}
+function saveState(){ localStorage.setItem('mathPrinceTest40', JSON.stringify(state)); }
+
+function renderHome(){
+  const totalDone = Object.values(state.progress).reduce((a,b)=>a+b,0);
+  document.getElementById('completedCount').textContent = totalDone;
+  const stage = totalDone===0 ? 'Dormant｜沉睡' : totalDone < 10 ? 'Spark｜火花' : totalDone < 25 ? 'Insight｜洞察' : 'Awakening｜覺醒';
+  document.getElementById('stageText').textContent = stage;
+  document.getElementById('barPersistence').style.width = `${Math.min(100,(state.stats.answered/40)*100)}%`;
+  const acc = state.stats.answered ? (state.stats.correct/state.stats.answered)*100 : 0;
+  document.getElementById('barAccuracy').style.width = `${acc}%`;
+
+  const grid = document.getElementById('unitGrid');
+  grid.innerHTML='';
+  Object.entries(units).forEach(([key,u])=>{
+    const done = state.progress[key]||0;
+    const wrong = state.wrong[key]||[];
+    const nextLabel = done===0 ? '開始作答' : (done>=allQuestions[key].length ? '再次練習' : `繼續第 ${done+1} 題`);
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML = `<div class="unit-title">${u.title}</div>
+      <div class="unit-sub">${u.subtitle}</div>
+      <div class="unit-meta"><span>已完成 ${done} / ${allQuestions[key].length}</span><span>錯題 ${wrong.length} 題</span></div>
+      <div class="actions">
+        <button class="btn primary">${nextLabel}</button>
+        <button class="btn secondary" ${wrong.length? '':'disabled'}>錯題複習</button>
+        <button class="btn ghost">重新開始</button>
+      </div>`;
+    const [b1,b2,b3]=card.querySelectorAll('button');
+    b1.onclick=()=>startUnit(key,false);
+    b2.onclick=()=>startUnit(key,true);
+    b3.onclick=()=>restartUnit(key);
+    grid.appendChild(card);
+  })
+}
+
+function restartUnit(unit){
+  if(!confirm(`確定要重新開始「${units[unit].title}」嗎？`)) return;
+  state.progress[unit]=0;
+  state.wrong[unit]=[];
+  saveState();
+  renderHome();
+}
+
+function startUnit(unit, review=false){
+  currentUnit = unit;
+  currentReviewMode = review;
+  if(review){
+    const ids = state.wrong[unit]||[];
+    reviewQueue = ids.map(id=>allQuestions[unit].find(q=>q.id===id)).filter(Boolean);
+    if(reviewQueue.length===0){ alert('目前沒有錯題可複習。'); return; }
+    currentIndex = 0;
+  } else {
+    reviewQueue = [];
+    currentIndex = Math.min(state.progress[unit]||0, allQuestions[unit].length-1);
+  }
+  document.getElementById('homeView').classList.add('hidden');
+  document.getElementById('questionView').classList.remove('hidden');
+  renderQuestion();
+}
+
+function getCurrentQuestion(){
+  return currentReviewMode ? reviewQueue[currentIndex] : allQuestions[currentUnit][currentIndex];
+}
+
+function renderQuestion(){
+  const q = getCurrentQuestion();
+  if(!q){ goHome(); return; }
+  document.getElementById('crumb').textContent = `${units[currentUnit].title}｜${currentReviewMode ? '錯題複習' : `第 ${currentIndex+1} / ${currentReviewMode?reviewQueue.length:allQuestions[currentUnit].length} 題`}｜${q.level}`;
+  document.getElementById('qTitle').textContent = q.title;
+  document.getElementById('qBody').textContent = q.body;
+  document.getElementById('answerInput').value='';
+  document.getElementById('feedbackWrap').innerHTML='';
+  renderWrongList();
+}
+
+function renderWrongList(){
+  const wrap = document.getElementById('wrongList');
+  wrap.innerHTML='';
+  const wrong = state.wrong[currentUnit]||[];
+  if(!wrong.length){ wrap.innerHTML='<span class="mini">目前沒有錯題。</span>'; return; }
+  wrong.forEach(id=>{
+    const q = allQuestions[currentUnit].find(x=>x.id===id);
+    const btn = document.createElement('button');
+    btn.className='pill';
+    btn.textContent = `${id} 查看詳解`;
+    btn.onclick=()=>showExplanation(q,false,true);
+    wrap.appendChild(btn);
+  });
+}
+
+function showExplanation(q, correct, reviewOnly=false){
+  const box = document.getElementById('feedbackWrap');
+  const cls = correct ? 'ok':'bad';
+  const title = correct ? '✅ 正確' : (reviewOnly ? '錯題詳解' : '❌ 還差一步');
+  box.innerHTML = `<div class="feedback ${cls}"><strong>${title}</strong><div class="explain">${q.explanation}</div></div>`;
+}
+
+function toHalfWidth(str){ return str.replace(/：/g,':').replace(/，/g,',').replace(/％/g,'%').replace(/／/g,'/'); }
+function normalizeText(str){ return toHalfWidth(str).replace(/\s+/g,'').toLowerCase(); }
+function parseNumeric(str){
+  let s = normalizeText(str);
+  s = s.replace(/星期/g,'').replace(/[公分公里公尺分鐘小時毫升公升公斤公克元杯片人圈度點杯數次份張本mlkmh]/g,'');
+  s = s.replace(/ml/g,'');
+  const mixed = s.match(/^(-?\d+)\+?(\d+)\/(\d+)$/); // handle accidental plus? unlikely
+  if(mixed) return Number(mixed[1]) + Number(mixed[2])/Number(mixed[3]);
+  const mixed2 = normalizeText(str).match(/^(-?\d+)\s+(\d+)\/(\d+)/);
+  if(mixed2) return Number(mixed2[1]) + Number(mixed2[2])/Number(mixed2[3]);
+  const frac = s.match(/^(-?\d+)\/(-?\d+)$/);
+  if(frac) return Number(frac[1])/Number(frac[2]);
+  const num = s.match(/-?\d+(?:\.\d+)?/);
+  return num ? Number(num[0]) : NaN;
+}
+function eqNumeric(user, expected){ return Number.isFinite(user) && Math.abs(user - expected) < 0.02; }
+function normalizeRatio(str){
+  const s = normalizeText(str);
+  const m = s.match(/(-?\d+)\s*:\s*(-?\d+)/);
+  if(!m) return null;
+  let a=Math.abs(Number(m[1])), b=Math.abs(Number(m[2]));
+  const g=(x,y)=>y?g(y,x%y):x||1; const d=g(a,b); return `${a/d}:${b/d}`;
+}
+function normalizeSet(str){
+  let s = toHalfWidth(str).toLowerCase();
+  s = s.replace(/和|與|及|、|\s+/g,',').replace(/星期/g,'');
+  s = s.replace(/杯|分鐘|公升|公尺/g,'');
+  const map = {'一':'1','二':'2','三':'3','四':'4','五':'5','六':'6','日':'7','天':'7'};
+  return Array.from(new Set(s.split(',').filter(Boolean).map(t=>map[t]||t))).sort();
+}
+function checkAnswer(q, raw){
+  if(q.answer.type==='numeric'){
+    const n = parseNumeric(raw);
+    if(eqNumeric(n,q.answer.value)) return true;
+    if((q.answer.forms||[]).some(f=> normalizeText(raw)===normalizeText(f))) return true;
+    return false;
+  }
+  if(q.answer.type==='set'){
+    const user = normalizeSet(raw);
+    const base = normalizeSet((q.answer.values||[]).join(','));
+    if(JSON.stringify(user)===JSON.stringify(base)) return true;
+    return (q.answer.aliases||[]).some(arr=> JSON.stringify(user)===JSON.stringify(normalizeSet(arr.join(','))));
+  }
+  if(q.answer.type==='multiDays'){
+    const user = normalizeSet(raw);
+    const expected = normalizeSet(q.answer.values.join(','));
+    return JSON.stringify(user)===JSON.stringify(expected);
+  }
+  if(q.answer.type==='ratio'){
+    return normalizeRatio(raw)===normalizeRatio(q.answer.value);
+  }
+  return false;
+}
+
+function submitAnswer(){
+  const q = getCurrentQuestion();
+  const raw = document.getElementById('answerInput').value.trim();
+  if(!raw){ alert('請先輸入答案。'); return; }
+  const ok = checkAnswer(q, raw);
+  state.stats.answered += 1;
+  if(ok) state.stats.correct += 1;
+  if(!ok && !(state.wrong[currentUnit]||[]).includes(q.id)) state.wrong[currentUnit].push(q.id);
+  if(ok){
+    const idx = state.wrong[currentUnit].indexOf(q.id);
+    if(idx>=0) state.wrong[currentUnit].splice(idx,1);
+  }
+  saveState();
+  showExplanation(q, ok, false);
+  renderWrongList();
+}
+function nextQuestion(){
+  if(currentReviewMode){
+    currentIndex++;
+    if(currentIndex>=reviewQueue.length){
+      alert('已完成本次錯題複習，將回到首頁。');
+      goHome();
+    } else renderQuestion();
+    return;
+  }
+  state.progress[currentUnit] = Math.min(allQuestions[currentUnit].length, (state.progress[currentUnit]||0)+1);
+  saveState();
+  currentIndex++;
+  if(currentIndex>=allQuestions[currentUnit].length){
+    alert(`完成「${units[currentUnit].title}」！`);
+    goHome();
+  } else {
+    renderQuestion();
+  }
+}
+function goHome(){
+  document.getElementById('questionView').classList.add('hidden');
+  document.getElementById('homeView').classList.remove('hidden');
+  renderHome();
+}
+
+document.getElementById('submitBtn').onclick = submitAnswer;
+document.getElementById('nextBtn').onclick = nextQuestion;
+document.getElementById('backHomeBtn').onclick = goHome;
+
+renderHome();
+</script>
+</body>
+</html>
