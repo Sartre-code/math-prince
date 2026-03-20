@@ -1,512 +1,127 @@
-<!doctype html>
-<html lang="zh-Hant">
+
+<!DOCTYPE html>
+<html lang="zh-TW">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>The Awakening of the Mathematical Prince | 數學王子的覺醒</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>數學王子的覺醒</title>
+
 <style>
-:root{
-  --bg:#f4f5f8;
-  --panel:#ffffff;
-  --card:#ffffff;
-  --text:#18233f;
-  --muted:#6b7280;
-  --accent:#6d5dfc;
-  --accent2:#8b5cf6;
-  --line:#e8eaf2;
-  --danger:#ef4444;
-  --ok:#16a34a;
-  --soft:#f7f8fc;
+body {
+  font-family: Arial;
+  background: #f5f6fa;
+  padding: 20px;
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Inter,"Noto Sans TC",system-ui,sans-serif;
-  background:linear-gradient(180deg,#f5f6fb 0%,#eef1f7 100%);
-  color:var(--text);
+
+.card {
+  background: white;
+  padding: 16px;
+  margin: 10px 0;
+  border-radius: 12px;
 }
-.container{max-width:1120px;margin:0 auto;padding:24px 18px 40px}
-.hero,.panel,.realm-card,.question-card,.sidebar-card{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:24px;
-  box-shadow:0 10px 30px rgba(24,35,63,.06);
+
+button {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #6c5ce7;
+  color: white;
 }
-.hero{padding:30px 26px;margin-bottom:20px;text-align:left}
-.hero h1{margin:0 0 6px;font-size:clamp(28px,4vw,48px);line-height:1.05}
-.hero .zh{font-size:clamp(20px,2.4vw,28px);font-weight:800;margin-bottom:18px}
-.hero p{margin:10px 0;color:var(--muted);line-height:1.8;font-size:18px}
-.panel{padding:24px}
-.grid{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-top:20px}
-.hidden{display:none !important}
-.section-title{margin:0 0 6px;font-size:32px;line-height:1.2}
-.subtle{color:var(--muted);line-height:1.7}
-.button{
-  appearance:none;border:none;border-radius:14px;padding:12px 16px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:800;
-  cursor:pointer;box-shadow:0 8px 20px rgba(109,93,252,.22)
+
+.progress {
+  height: 10px;
+  background: #ddd;
+  border-radius: 10px;
 }
-.button.secondary{
-  background:#eef1fb;color:#2f3b66;box-shadow:none;border:1px solid #dfe4f4
-}
-.button.ghost{background:transparent;border:1px solid #d7dced;color:#334155;box-shadow:none}
-.button:disabled{opacity:.5;cursor:not-allowed}
-.hero-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px}
-.stat{
-  padding:16px;border-radius:18px;background:var(--soft);border:1px solid var(--line)
-}
-.stat strong{display:block;font-size:22px;margin-top:6px}
-.mastery-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}
-.mastery-card{padding:16px;border-radius:18px;background:var(--soft);border:1px solid var(--line)}
-.bar{height:10px;background:#e8edf8;border-radius:999px;overflow:hidden;margin-top:8px}
-.fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));width:0}
-.realm-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:18px}
-.realm-card{padding:18px}
-.realm-card h3{margin:0 0 8px;font-size:22px}
-.realm-card p{color:var(--muted);min-height:52px;line-height:1.7}
-.realm-meta{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:10px 0 14px}
-.realm-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.realm-actions .button.full{grid-column:1/-1}
-.small{font-size:13px;color:var(--muted)}
-.question-card{padding:24px}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{
-  display:inline-block;padding:6px 10px;border-radius:999px;
-  background:#eef1fb;color:#344074;font-size:12px;border:1px solid #dfe4f4
-}
-.question{font-size:21px;line-height:1.95;margin:18px 0;white-space:pre-line}
-input[type=text]{
-  width:100%;padding:15px 16px;border-radius:14px;border:1px solid #d9dfef;
-  background:#fff;color:#111827;font-size:18px
-}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-.feedback{
-  margin-top:18px;padding:16px;border-radius:16px;background:var(--soft);white-space:pre-line;line-height:1.8
-}
-.feedback.ok{border:1px solid rgba(22,163,74,.22)}
-.feedback.err{border:1px solid rgba(239,68,68,.22)}
-.sidebar-card{padding:18px;margin-bottom:16px}
-.wrong-item{
-  display:flex;justify-content:space-between;align-items:center;gap:8px;
-  padding:12px 0;border-bottom:1px solid var(--line)
-}
-.wrong-item:last-child{border-bottom:none}
-.top-actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-.footer-note{margin-top:14px;color:var(--muted);font-size:14px}
-@media (max-width:900px){
-  .grid{grid-template-columns:1fr}
-  .realm-grid,.mastery-grid,.hero-stats{grid-template-columns:1fr}
-  .container{padding:16px 14px 32px}
-  .hero{padding:24px 18px}
-  .section-title{font-size:28px}
-  .question{font-size:19px}
+
+.bar {
+  height: 10px;
+  background: #6c5ce7;
+  border-radius: 10px;
+  width: 0%;
 }
 </style>
+
 </head>
+
 <body>
-<div class="container">
-  <section class="hero">
-    <h1>The Awakening of the Mathematical Prince</h1>
-    <div class="zh">數學王子的覺醒</div>
-    <p>Every child holds the potential to become a Mathematical Prince. Through reasoning, curiosity, and practice, the awakening begins.</p>
-    <p>每個孩子都擁有成為數學王子的潛力。透過思考、探索與練習，數學能力將逐漸覺醒。</p>
-  </section>
 
-  <section id="homeView" class="panel">
-    <h2 class="section-title">Choose Your Realm｜選擇覺醒領域</h2>
-    <div class="subtle">從你上次的進度直接續做，或針對錯題進行同概念再挑戰。</div>
+<h2>選擇覺醒領域</h2>
 
-    <div class="hero-stats">
-      <div class="stat">
-        <div>Awakening Status</div>
-        <strong id="awakeningText">Dormant</strong>
-        <div class="small" id="awakeningSub">0 / 60 completed</div>
-      </div>
-      <div class="stat">
-        <div>Skill Growth</div>
-        <div class="small">Reasoning</div><div class="bar"><div id="reasoningBar" class="fill"></div></div>
-        <div class="small" style="margin-top:10px">Accuracy</div><div class="bar"><div id="accuracyBar" class="fill"></div></div>
-        <div class="small" style="margin-top:10px">Persistence</div><div class="bar"><div id="persistenceBar" class="fill"></div></div>
-      </div>
-    </div>
-
-    <div class="mastery-grid">
-      <div class="mastery-card">
-        <div>Fraction Mastery</div>
-        <strong id="fractionMasteryText">0%</strong>
-        <div class="bar"><div id="fractionMasteryBar" class="fill"></div></div>
-      </div>
-      <div class="mastery-card">
-        <div>Percentage Mastery</div>
-        <strong id="percentageMasteryText">0%</strong>
-        <div class="bar"><div id="percentageMasteryBar" class="fill"></div></div>
-      </div>
-      <div class="mastery-card">
-        <div>Speed Mastery</div>
-        <strong id="speedMasteryText">0%</strong>
-        <div class="bar"><div id="speedMasteryBar" class="fill"></div></div>
-      </div>
-    </div>
-
-    <div class="realm-grid" id="realmGrid"></div>
-  </section>
-
-  <section id="questionView" class="grid hidden">
-    <div class="question-card">
-      <div class="top-actions">
-        <div class="chips">
-          <span id="realmChip" class="chip"></span>
-          <span id="stageChip" class="chip"></span>
-          <span id="conceptChip" class="chip"></span>
-        </div>
-        <button class="button ghost" id="backHome">← 回首頁</button>
-      </div>
-      <div id="questionText" class="question"></div>
-      <label for="answerInput" class="subtle">Your Answer｜你的答案</label>
-      <input id="answerInput" type="text" autocomplete="off" placeholder="請輸入答案，例如 5/8、120、30分鐘" />
-      <div class="actions">
-        <button class="button" id="submitBtn">Submit Answer</button>
-        <button class="button secondary hidden" id="nextBtn">Next Stage</button>
-      </div>
-      <div id="feedback" class="feedback hidden"></div>
-      <div id="explanation" class="feedback hidden"></div>
-      <div class="footer-note" id="modeNote"></div>
-    </div>
-    <aside>
-      <div class="sidebar-card">
-        <h3 style="margin-top:0">Your Awakening Journey</h3>
-        <div id="realmProgress"></div>
-      </div>
-      <div class="sidebar-card">
-        <h3 style="margin-top:0">本單元錯題整理</h3>
-        <div id="wrongList" class="small">目前沒有錯題。</div>
-        <div class="actions" style="margin-top:14px">
-          <button class="button secondary" id="retryWrongBtn">Retry Wrong Questions</button>
-        </div>
-      </div>
-    </aside>
-  </section>
+<div class="card">
+  覺醒進度：0 / 60
 </div>
+
+<div class="card">
+  學習成長（Persistence）
+  <div class="progress"><div id="bar" class="bar"></div></div>
+</div>
+
+<div class="card">
+  <b>分數之域</b><br><br>
+  <button onclick="start()">開始</button>
+</div>
+
+<div id="game" style="display:none;">
+  <h3 id="question"></h3>
+  <input id="answer">
+  <button onclick="submit()">送出</button>
+  <p id="result"></p>
+</div>
+
 <script>
-const realmsMeta={fraction:{label:'Fraction Realm｜分數之域',desc:'理解部分與整體、剩餘量與逆推。'},percentage:{label:'Percentage Realm｜百分率之域',desc:'掌握折扣、增加、減少與逆推。'},speed:{label:'Speed Realm｜速率之域',desc:'理解時間、距離、速度與交通情境。'}};
-const questions=[
-['F1','fraction','fraction_addition','中高','媽媽做了一個蛋糕，切成 8 等份。\n爸爸吃了 3/8，姐姐吃了 1/4。\n\n請問全家一共吃了多少蛋糕？','5/8','1/4 = 2/8。\n3/8 + 2/8 = 5/8。'],
-['F2','fraction','fraction_subtraction','中高','一瓶果汁原本裝滿。\n小明先喝掉 1/5，妹妹又喝掉 1/4 瓶。\n\n現在瓶子裡還剩多少？','11/20','1/5 = 4/20，1/4 = 5/20。\n共喝掉 9/20，所以剩 11/20。'],
-['F3','fraction','fraction_of_quantity','中高','一本小說共有 240 頁。\n第一天讀了 1/6，第二天讀了 1/4。\n\n兩天共讀了多少頁？','100','240 × 1/6 = 40。\n240 × 1/4 = 60。\n共 100 頁。'],
-['F4','fraction','fraction_addition','中高','學校花園中，2/5 的土地種花，1/4 的土地種樹。\n\n請問共有多少土地被種植？','13/20','2/5 = 8/20，1/4 = 5/20。\n8/20 + 5/20 = 13/20。'],
-['F5','fraction','fraction_remaining','中高','游泳池原本裝滿水。\n上午排掉 1/3，下午又排掉 1/6。\n\n現在還剩多少水？','1/2','1/3 = 2/6。\n共排掉 3/6 = 1/2，所以還剩 1/2。'],
-['F6','fraction','fraction_conversion','中高','班上訂了 3 個披薩，每個切成 8 片。\n小明吃了 3 片，小強吃了 1/4 個披薩。\n\n兩人共吃多少個披薩？','5/8','3 片 = 3/8 個披薩，1/4 = 2/8。\n共吃 5/8。'],
-['F7','fraction','fraction_subtraction','中高','一個水桶原本裝滿。\n媽媽先用掉 1/4，之後洗車又用掉 1/3 桶。\n\n桶裡還剩多少水？','5/12','1/4 = 3/12，1/3 = 4/12。\n共用掉 7/12，剩 5/12。'],
-['F8','fraction','fraction_of_quantity','中高','做蛋糕需要 1/2 公斤麵粉。\n今天做了 3 個蛋糕。\n\n一共需要多少公斤麵粉？','1.5','1/2 × 3 = 3/2 = 1.5 公斤。'],
-['F9','fraction','fraction_remaining','高','公園草地面積 600 平方公尺。\n其中 2/3 用來種草，剩下的 1/4 用來做花圃。\n\n花圃面積是多少？','50','先算種草：600 × 2/3 = 400。\n剩 200。\n花圃：200 × 1/4 = 50。'],
-['F10','fraction','fraction_of_quantity','高','媽媽買了一袋 60 顆橘子。\n第一天吃掉 1/5，第二天吃掉 1/6。\n\n兩天共吃了多少顆？','22','60 × 1/5 = 12。\n60 × 1/6 = 10。\n共吃 22 顆。'],
-['F11','fraction','fraction_remaining','高','一本漫畫書，小明先讀了 2/5，隔天又讀了 1/5。\n\n現在還剩多少沒讀？','2/5','2/5 + 1/5 = 3/5。\n剩 2/5。'],
-['F12','fraction','fraction_of_quantity','高','一條登山步道長 12 公里。\n第一段走 1/3，第二段走 1/4。\n\n共走了多少公里？','7','12 × 1/3 = 4。\n12 × 1/4 = 3。\n共走 7 公里。'],
-['F13','fraction','fraction_weight','高','做水果拼盤需要 1/4 個西瓜與 1/3 個哈密瓜。\n已知一個西瓜重 4 公斤，一個哈密瓜重 3 公斤。\n\n請問共用了多少公斤水果？','2','西瓜：4 × 1/4 = 1 公斤。\n哈密瓜：3 × 1/3 = 1 公斤。\n共 2 公斤。'],
-['F14','fraction','fraction_of_remaining','高','全班掃地區域已完成 3/4。\n剩下的 1/2 已在今天完成。\n\n請問今天完成了全部工作的幾分之幾？','1/8','剩下 1/4。\n今天完成剩下的一半：1/4 × 1/2 = 1/8。'],
-['F15','fraction','fraction_remaining','高','一壺果汁先倒出 1/4 招待客人，之後又倒出 1/5 做飲料。\n\n壺裡還剩多少？','11/20','1/4 = 5/20，1/5 = 4/20。\n剩 11/20。'],
-['F16','fraction','fraction_of_quantity','高','全班 40 人，其中 3/5 通過考試。\n\n通過的人數是多少？','24','40 × 3/5 = 24。'],
-['F17','fraction','fraction_of_quantity','高','旅行行程共 15 小時。\n第一天走了全程的 2/5。\n\n第一天走了多少小時？','6','15 × 2/5 = 6 小時。'],
-['F18','fraction','fraction_of_quantity','高','一袋餅乾有 48 片，其中 1/6 被弟弟吃掉。\n\n弟弟吃了多少片？','8','48 × 1/6 = 8。'],
-['F19','fraction','fraction_remaining','高','一個月電費預算的 3/4 已經用完。\n\n還剩多少？','1/4','1 - 3/4 = 1/4。'],
-['F20','fraction','fraction_reverse','挑戰','小包一家人平常一年吃 60 公斤米。\n今年小兒子食量大增，前三個月就吃掉平常一年米量的 1/3。\n如果食量維持一樣，請問今年一年大約需要多少公斤米？','80','前三個月吃掉平常一年量的 1/3：60 × 1/3 = 20 公斤。\n每月平均吃 20 ÷ 3 公斤。\n一年 12 個月，所以全年需米量：(20 ÷ 3) × 12 = 80 公斤。\n也可以用比例看：一年是 3 個月的 4 倍，所以全年吃掉平常一年量的 4/3。\n60 × 4/3 = 80。'],
-['P1','percentage','percentage_discount','中高','百貨公司一件外套原價 2000 元。\n周年慶先打 8 折，會員再享 9 折。\n\n最後需要付多少元？','1440','2000 × 0.8 = 1600。\n1600 × 0.9 = 1440。'],
-['P2','percentage','percentage_discount','中高','夜市飲料原價 50 元，今天打 8 折。\n小明買 3 杯。\n\n需要多少錢？','120','50 × 0.8 = 40。\n3 × 40 = 120。'],
-['P3','percentage','percentage_increase','中高','小華上次數學考 60 分，這次考 75 分。\n\n成績增加了多少百分率？','25','增加 15 分。\n15 ÷ 60 = 0.25 = 25%。'],
-['P4','percentage','percentage_increase','中高','去年夏天電費 3200 元。\n今年電費增加 15%。\n\n今年電費是多少？','3680','增加 3200 × 0.15 = 480。\n3200 + 480 = 3680。'],
-['P5','percentage','percentage_decrease','中高','一雙球鞋原價 1500 元，現在降價 20%。\n\n現在售價多少？','1200','1500 × 0.2 = 300。\n1500 - 300 = 1200。'],
-['P6','percentage','percentage_discount','中高','書店一本書原價 400 元，今天打 75 折。\n買 2 本。\n\n需要多少錢？','600','400 × 0.75 = 300。\n2 本共 600。'],
-['P7','percentage','percentage_reverse','中高','一件衣服打 8 折後售價 960 元。\n\n原價是多少？','1200','原價 × 0.8 = 960。\n960 ÷ 0.8 = 1200。'],
-['P8','percentage','percentage_interest','中高','小明銀行存款 20000 元，一年利息 2%。\n\n一年後存款變多少？','20400','利息 20000 × 0.02 = 400。\n總額 20400。'],
-['P9','percentage','percentage_ratio','中高','班上有 40 人，今天有 36 人到校。\n\n今天的出席率是多少？','90','36 ÷ 40 = 0.9 = 90%。'],
-['P10','percentage','percentage_addon','中高','餐廳餐點費用 1200 元，需加收 10% 服務費。\n\n總共要付多少？','1320','服務費 120。\n共 1320。'],
-['P11','percentage','percentage_decrease','高','小明上次考試 80 分，這次考 72 分。\n\n成績下降多少百分率？','10','下降 8 分。\n8 ÷ 80 = 0.1 = 10%。'],
-['P12','percentage','percentage_profit','高','商店進貨價 500 元，老闆以 20% 利潤出售。\n\n售價是多少？','600','利潤 500 × 0.2 = 100。\n售價 600。'],
-['P13','percentage','percentage_decrease','高','原本電話費 800 元。改用新方案後節省 25%。\n\n現在費用多少？','600','節省 800 × 0.25 = 200。\n800 - 200 = 600。'],
-['P14','percentage','percentage_discount','高','原價 1000 元商品先打 9 折，再打 8 折。\n\n最後價格多少？','720','1000 × 0.9 = 900。\n900 × 0.8 = 720。'],
-['P15','percentage','percentage_of_quantity','高','全校 500 人，其中 40% 參加捐款。\n\n共有多少人參加？','200','500 × 0.4 = 200。'],
-['P16','percentage','percentage_mixed','高','商品原價 800 元。先降價 25%，之後又上漲 25%。\n\n現在價格多少？','750','先降：800 × 0.75 = 600。\n再漲：600 × 1.25 = 750。'],
-['P17','percentage','percentage_increase','高','某村莊人口 2000 人，一年增加 10%。\n\n一年後人口多少？','2200','增加 200 人，共 2200 人。'],
-['P18','percentage','percentage_discount','高','商店商品 1200 元，會員可享 85 折。\n\n需付多少？','1020','1200 × 0.85 = 1020。'],
-['P19','percentage','percentage_ratio','高','班級 30 人，有 18 人支持新班服設計。\n\n支持比例是多少？','60','18 ÷ 30 = 0.6 = 60%。'],
-['P20','percentage','percentage_discount','挑戰','商品原價 1000 元。活動依序 9 折、9 折、8 折。\n\n最後價格多少？','648','1000 × 0.9 = 900。\n900 × 0.9 = 810。\n810 × 0.8 = 648。'],
-['S1','speed','speed_time','中高','小明搭台北捷運通勤。\n捷運平均速度 40 公里/小時，家到學校距離 20 公里。\n\n需要多少分鐘？','30','20 ÷ 40 = 0.5 小時 = 30 分鐘。'],
-['S2','speed','speed_time','中高','小華搭台鐵從台中到嘉義。\n火車平均速度 60 公里/小時，距離 90 公里。\n\n需要多少小時？','1.5','90 ÷ 60 = 1.5 小時。'],
-['S3','speed','speed_time','中高','高鐵從台北到台中，距離 165 公里，平均速度 165 公里/小時。\n\n車程約多少小時？','1','165 ÷ 165 = 1 小時。'],
-['S4','speed','speed_time','中高','飛機從桃園飛往香港，距離 900 公里，平均速度 600 公里/小時。\n\n飛行時間是多少小時？','1.5','900 ÷ 600 = 1.5 小時。'],
-['S5','speed','speed_time','中高','小明搭公車上學。\n公車平均速度 30 公里/小時，學校距離 15 公里。\n\n需要多少分鐘？','30','15 ÷ 30 = 0.5 小時 = 30 分鐘。'],
-['S6','speed','speed_distance','中高','小華騎腳踏車速度 12 公里/小時，騎了 45 分鐘。\n\n請問騎了多少公里？','9','45 分鐘 = 0.75 小時。\n12 × 0.75 = 9。'],
-['S7','speed','speed_multistage','中高','小明搭捷運通勤：第一段 10 公里，第二段 6 公里。\n捷運平均速度 40 公里/小時。\n\n整趟車程需要多少分鐘？','24','總距離 16 公里。\n16 ÷ 40 = 0.4 小時 = 24 分鐘。'],
-['S8','speed','speed_difference','中高','火車速度 80 公里/小時，汽車速度 60 公里/小時。\n兩者都行駛 2 小時。\n\n火車比汽車多走多少公里？','40','火車 160 公里，汽車 120 公里。\n差 40 公里。'],
-['S9','speed','speed_time','中高','高鐵速度 200 公里/小時。\n若行駛 100 公里，需要多少分鐘？','30','100 ÷ 200 = 0.5 小時 = 30 分鐘。'],
-['S10','speed','speed_difference','中高','小明騎車速度 15 公里/小時，小華騎車速度 12 公里/小時。\n兩人都騎 2 小時。\n\n小明比小華多騎多少公里？','6','小明 30 公里，小華 24 公里。\n差 6 公里。'],
-['S11','speed','speed_distance','高','公車速度 40 公里/小時，行駛 1.5 小時。\n\n行駛距離多少？','60','40 × 1.5 = 60。'],
-['S12','speed','speed_time','高','火車速度 70 公里/小時，從 A 到 B 距離 140 公里。\n\n單程需要多少小時？','2','140 ÷ 70 = 2 小時。'],
-['S13','speed','speed_difference','高','甲火車速度 90 km/h，乙火車速度 60 km/h。\n兩車同時行駛 3 小時。\n\n甲比乙多走多少公里？','90','甲 270，乙 180。\n差 90。'],
-['S14','speed','speed_comparison','高','小明搭捷運速度 40 km/h，小華搭公車速度 30 km/h。\n兩人都行駛 20 公里。\n\n請問兩人的到達時間相差多少分鐘？','10','小明：20 ÷ 40 = 0.5 小時 = 30 分鐘。\n小華：20 ÷ 30 ≈ 0.67 小時 ≈ 40 分鐘。\n相差 10 分鐘。'],
-['S15','speed','speed_rate','高','飛機飛 1200 公里，花 2 小時。\n\n平均速度多少？','600','1200 ÷ 2 = 600。'],
-['S16','speed','speed_time','高','登山步道長 9 公里，小明走路速度 3 公里/小時。\n\n需要多少小時？','3','9 ÷ 3 = 3。'],
-['S17','speed','speed_rate','高','小明騎腳踏車 20 公里，花 2 小時。\n\n平均速度多少？','10','20 ÷ 2 = 10。'],
-['S18','speed','speed_multistage','高','公車第一段 20 公里，第二段 10 公里，速度 30 公里/小時。\n\n總時間多少小時？','1','總距離 30。\n30 ÷ 30 = 1。'],
-['S19','speed','speed_distance','高','高鐵速度 200 km/h，行駛 2 小時。\n\n總距離多少公里？','400','200 × 2 = 400。'],
-['S20','speed','speed_multistage','挑戰','小明旅行：火車 2 小時（60 km/h），公車 1 小時（40 km/h）。\n\n總共走多少公里？','160','火車 120 公里，公車 40 公里。\n共 160 公里。']
-].map(([id,realm,concept,difficulty,question,answer,explanation])=>({id,realm,concept,difficulty,question,answer,explanation}));
-const conceptNames={fraction_addition:'分數加總',fraction_subtraction:'分數剩餘量',fraction_of_quantity:'分數求量',fraction_remaining:'分數剩餘判斷',fraction_conversion:'分數與片數轉換',fraction_weight:'分數重量',fraction_of_remaining:'剩餘的一部分',fraction_reverse:'分數逆推',percentage_discount:'折扣',percentage_increase:'增加率',percentage_decrease:'減少率',percentage_reverse:'百分率逆推',percentage_interest:'利息',percentage_ratio:'百分率比例',percentage_addon:'加成費用',percentage_profit:'利潤',percentage_of_quantity:'百分率求量',percentage_mixed:'先降後升',speed_time:'距離求時間',speed_distance:'速度求距離',speed_multistage:'多段行程',speed_difference:'速率差',speed_comparison:'時間比較',speed_rate:'求速率'};
-const retryBank={
-fraction_reverse:[{id:'F-V1',realm:'fraction',concept:'fraction_reverse',difficulty:'挑戰',question:'某家庭平常一年用油 48 公升。今年前 4 個月就用掉平常一年用量的 1/3。如果速度不變，今年大約要用多少公升油？',answer:'48',explanation:'前 4 個月用掉平常一年量的 1/3：48 × 1/3 = 16 公升。\n一年有 3 個四個月，所以全年 16 × 3 = 48 公升。'},{id:'F-V2',realm:'fraction',concept:'fraction_reverse',difficulty:'挑戰',question:'某店平常一年用麵粉 90 公斤。今年前 6 個月就用掉平常一年用量的 2/3。如果速度不變，今年一年大約要用多少公斤麵粉？',answer:'120',explanation:'前 6 個月用掉 90 × 2/3 = 60 公斤。\n一年是兩個 6 個月，所以全年 60 × 2 = 120 公斤。'}],
-fraction_addition:[{id:'F-A',realm:'fraction',concept:'fraction_addition',difficulty:'挑戰',question:'一條巧克力切成 12 等份，哥哥吃了 1/3，妹妹吃了 1/4。兩人共吃多少？',answer:'7/12',explanation:'1/3 = 4/12，1/4 = 3/12，共吃 7/12。'}],
-fraction_subtraction:[{id:'F-S',realm:'fraction',concept:'fraction_subtraction',difficulty:'挑戰',question:'一桶飲料先倒出 1/6，又倒出 1/3。還剩多少？',answer:'1/2',explanation:'1/6 + 1/3 = 1/6 + 2/6 = 3/6，所以剩 1/2。'}],
-fraction_of_quantity:[{id:'F-Q',realm:'fraction',concept:'fraction_of_quantity',difficulty:'挑戰',question:'一本故事書有 180 頁，第一天看了 1/6，第二天看了 1/3。兩天共看了多少頁？',answer:'90',explanation:'180 × 1/6 = 30，180 × 1/3 = 60，共 90 頁。'}],
-fraction_remaining:[{id:'F-R',realm:'fraction',concept:'fraction_remaining',difficulty:'挑戰',question:'一桶水先用掉 2/5，再用掉 1/10。還剩多少？',answer:'1/2',explanation:'2/5 = 4/10，共用掉 5/10，剩 1/2。'}],
-percentage_discount:[{id:'P-D1',realm:'percentage',concept:'percentage_discount',difficulty:'挑戰',question:'一件外套原價 1500 元，先打 9 折，再打 8 折。最後售價多少？',answer:'1080',explanation:'1500 × 0.9 = 1350，1350 × 0.8 = 1080。'}],
-percentage_reverse:[{id:'P-R',realm:'percentage',concept:'percentage_reverse',difficulty:'挑戰',question:'一件商品打 8 折後售價 480 元。原價多少？',answer:'600',explanation:'原價 × 0.8 = 480，所以原價 = 480 ÷ 0.8 = 600。'}],
-percentage_increase:[{id:'P-I',realm:'percentage',concept:'percentage_increase',difficulty:'挑戰',question:'某商品原價 800 元，今年漲價 25%。現在價格多少？',answer:'1000',explanation:'增加 800 × 0.25 = 200，所以現價 1000。'}],
-percentage_decrease:[{id:'P-DE',realm:'percentage',concept:'percentage_decrease',difficulty:'挑戰',question:'一項費用原本 1200 元，現在減少 15%。現在是多少元？',answer:'1020',explanation:'減少 1200 × 0.15 = 180，現在 1020。'}],
-percentage_profit:[{id:'P-P',realm:'percentage',concept:'percentage_profit',difficulty:'挑戰',question:'商店進貨價 800 元，加 25% 利潤出售。售價多少？',answer:'1000',explanation:'利潤 800 × 0.25 = 200，售價 1000。'}],
-speed_time:[{id:'S-T',realm:'speed',concept:'speed_time',difficulty:'挑戰',question:'台鐵平均速度 80 公里/小時，從甲站到乙站距離 120 公里。需要多少小時？',answer:'1.5',explanation:'120 ÷ 80 = 1.5 小時。'}],
-speed_distance:[{id:'S-D',realm:'speed',concept:'speed_distance',difficulty:'挑戰',question:'一台公車速度 50 公里/小時，行駛 1.2 小時。總距離多少公里？',answer:'60',explanation:'50 × 1.2 = 60。'}],
-speed_multistage:[{id:'S-M',realm:'speed',concept:'speed_multistage',difficulty:'挑戰',question:'旅程分兩段：火車 1.5 小時（80 km/h），公車 0.5 小時（40 km/h）。共走多少公里？',answer:'140',explanation:'火車 80 × 1.5 = 120，公車 40 × 0.5 = 20，共 140。'}],
-speed_difference:[{id:'S-F',realm:'speed',concept:'speed_difference',difficulty:'挑戰',question:'甲車時速 90 公里，乙車時速 70 公里，兩車都走 2 小時。甲比乙多走多少公里？',answer:'40',explanation:'甲 180，乙 140，差 40。'}],
-speed_comparison:[{id:'S-C',realm:'speed',concept:'speed_comparison',difficulty:'挑戰',question:'A 車速度 60 km/h，B 車速度 40 km/h，兩車都行駛 120 公里。到達時間相差多少小時？',answer:'1',explanation:'A 車 120 ÷ 60 = 2 小時，B 車 120 ÷ 40 = 3 小時，相差 1 小時。'}],
-speed_rate:[{id:'S-R',realm:'speed',concept:'speed_rate',difficulty:'挑戰',question:'一架飛機飛 1500 公里，花 2.5 小時。平均速度多少 km/h？',answer:'600',explanation:'1500 ÷ 2.5 = 600。'}]
-};
-const state=JSON.parse(localStorage.getItem('mathPrinceState')||'{}');
-state.completed=state.completed||{}; state.correct=state.correct||{}; state.wrongs=state.wrongs||{fraction:[],percentage:[],speed:[]}; state.mastery=state.mastery||{}; state.nextIndex=state.nextIndex||{fraction:0,percentage:0,speed:0};
-let currentRealm='fraction', currentIndex=0, currentQuestion=null, currentMode='normal', reviewPayload=null, returnToIndex=0;
-function save(){localStorage.setItem('mathPrinceState',JSON.stringify(state));}
-function realmQuestions(realm){return questions.filter(q=>q.realm===realm)}
-function completedCount(){return Object.keys(state.completed).length}
-function correctCount(){return Object.keys(state.correct).length}
-function masteryForRealm(realm){const arr=realmQuestions(realm); const correct=arr.filter(q=>state.correct[q.id]).length; return Math.round(correct/arr.length*100);}
-function updateHome(){
-  const total=questions.length, done=completedCount();
-  const stage= done===0?'Dormant':done<15?'Spark':done<40?'Insight':'Awakened';
-  document.getElementById('awakeningText').textContent=stage;
-  document.getElementById('awakeningSub').textContent=`${done} / ${total} completed`;
-  document.getElementById('reasoningBar').style.width=`${Math.min(100,Math.round(done/total*100))}%`;
-  document.getElementById('accuracyBar').style.width=`${Math.min(100,Math.round((correctCount()/Math.max(1,done))*100))}%`;
-  const wrongTotal=Object.values(state.wrongs).reduce((a,b)=>a+b.length,0);
-  document.getElementById('persistenceBar').style.width=`${Math.min(100,Math.round((done+wrongTotal)/total*100))}%`;
-  ['fraction','percentage','speed'].forEach(realm=>{
-    const m=masteryForRealm(realm);
-    document.getElementById(realm+'MasteryText').textContent=`${m}%`;
-    document.getElementById(realm+'MasteryBar').style.width=`${m}%`;
-  });
-  const grid=document.getElementById('realmGrid'); grid.innerHTML='';
-  ['fraction','percentage','speed'].forEach(realm=>{
-    const arr=realmQuestions(realm);
-    const doneR=arr.filter(q=>state.completed[q.id]).length;
-    const wrongR=(state.wrongs[realm]||[]).length;
-    const nextStage=Math.min(state.nextIndex[realm]||0, arr.length-1);
-    const canContinue=doneR>0 && nextStage < arr.length;
-    const card=document.createElement('div');
-    card.className='realm-card';
-    card.innerHTML=`
-      <h3>${realmsMeta[realm].label}</h3>
-      <p>${realmsMeta[realm].desc}</p>
-      <div class="realm-meta">
-        <div class="small">已完成 ${doneR} / ${arr.length}<br>掌握度 ${masteryForRealm(realm)}%</div>
-        <div class="small">${canContinue?`下次從第 ${nextStage+1} 題開始`:'尚未開始或已完成'}</div>
-      </div>
-      <div class="realm-actions">
-        <button class="button full">${canContinue?'Continue':'Start'}</button>
-        <button class="button secondary">Review Wrong${wrongR?` (${wrongR})`:''}</button>
-        <button class="button ghost">Restart</button>
-      </div>`;
-    const [continueBtn, reviewBtn, restartBtn]=card.querySelectorAll('button');
-    continueBtn.onclick=()=>startRealm(realm, canContinue?nextStage:0);
-    reviewBtn.onclick=()=>{currentRealm=realm; currentIndex=Math.max(0,(state.nextIndex[realm]||1)-1); retryWrong();}
-    reviewBtn.disabled = wrongR===0;
-    restartBtn.onclick=()=>restartRealm(realm);
-    grid.appendChild(card);
-  });
-}
-function restartRealm(realm){
-  realmQuestions(realm).forEach(q=>{ delete state.completed[q.id]; delete state.correct[q.id]; });
-  state.wrongs[realm]=[];
-  state.nextIndex[realm]=0;
-  save(); updateHome();
-}
-function renderRealmProgress(){
-  const box=document.getElementById('realmProgress'); box.innerHTML='';
-  ['fraction','percentage','speed'].forEach(realm=>{
-    const arr=realmQuestions(realm); const done=arr.filter(q=>state.completed[q.id]).length;
-    const div=document.createElement('div'); div.className='wrong-item';
-    div.innerHTML=`<span>${realmsMeta[realm].label}</span><strong>${done} / ${arr.length}</strong>`;
-    box.appendChild(div);
-  });
-}
-function normalize(s){
-  return String(s)
-    .trim()
-    .toLowerCase()
-    .replace(/，/g, ',')
-    .replace(/：/g, ':')
-    .replace(/／/g, '/')
-    .replace(/　/g, ' ')
-    .replace(/\s+/g, ' ');
-}
-function parseNumericValue(input){
-  const s=normalize(input);
-  if(!s) return NaN;
 
-  // mixed number: 1 1/2, 1又1/2
-  let m=s.match(/(-?\d+)\s*(?:又)?\s+(\d+)\s*\/\s*(\d+)/);
-  if(m){
-    const whole=Number(m[1]), num=Number(m[2]), den=Number(m[3]);
-    if(den!==0){
-      const sign=whole<0?-1:1;
-      return whole + sign*(num/den);
-    }
+let current = 0;
+let answered = 0;
+
+const questions = [
+  {q:"5/8 + 1/4 = ?", a:0.875},
+  {q:"一人走1.5小時，另一人走1小時，差幾小時？", a:0.5}
+];
+
+function start(){
+  document.getElementById("game").style.display="block";
+  load();
+}
+
+function load(){
+  document.getElementById("question").innerText = questions[current].q;
+}
+
+function normalize(input){
+  input = input.replace("小時","");
+  if(input.includes(" ")){
+    let parts = input.split(" ");
+    let whole = parseFloat(parts[0]);
+    let frac = parts[1].split("/");
+    return whole + frac[0]/frac[1];
+  }
+  if(input.includes("/")){
+    let frac = input.split("/");
+    return frac[0]/frac[1];
+  }
+  return parseFloat(input);
+}
+
+function submit(){
+  let user = normalize(document.getElementById("answer").value);
+  let correct = questions[current].a;
+
+  if(Math.abs(user - correct) < 0.01){
+    document.getElementById("result").innerText="正確";
+    answered++;
+    document.getElementById("bar").style.width = (answered/10*100)+"%";
+  }else{
+    document.getElementById("result").innerText="錯誤";
   }
 
-  // standalone fraction: 3/2
-  m=s.match(/(-?\d+)\s*\/\s*(\d+)/);
-  if(m){
-    const num=Number(m[1]), den=Number(m[2]);
-    if(den!==0) return num/den;
+  current++;
+  if(current < questions.length){
+    load();
   }
+}
 
-  // decimal or integer, optionally followed by units/text
-  m=s.match(/-?\d+(?:\.\d+)?/);
-  if(m) return Number(m[0]);
-
-  return NaN;
-}
-function isCorrect(user, expected){
-  const u=normalize(user), e=normalize(expected);
-  if(!u) return false;
-  if(u===e) return true;
-
-  const expectedNum=parseNumericValue(e);
-  const userNum=parseNumericValue(u);
-  if(!Number.isNaN(expectedNum) && !Number.isNaN(userNum)){
-    return Math.abs(userNum-expectedNum) < 1e-9;
-  }
-
-  // Fallback: allow exact answer token to appear inside explanatory text.
-  return u.includes(e);
-}
-function markWrong(q){const list=state.wrongs[q.realm]; if(!list.find(x=>x.id===q.id)) list.push({id:q.id,concept:q.concept}); save(); renderWrongList();}
-function clearWrongByConcept(realm, concept){state.wrongs[realm]=state.wrongs[realm].filter(x=>x.concept!==concept); save(); renderWrongList();}
-function renderWrongList(){
-  const box=document.getElementById('wrongList');
-  const list=state.wrongs[currentRealm]||[];
-  if(!list.length){box.textContent='目前沒有錯題。'; return;}
-  box.innerHTML='';
-  list.forEach(item=>{
-    const orig=questions.find(q=>q.id===item.id);
-    const row=document.createElement('div'); row.className='wrong-item';
-    const label=document.createElement('div');
-    label.innerHTML=`<div><strong>${item.id}</strong></div><div class='small'>${conceptNames[item.concept]||item.concept}</div>`;
-    const btn=document.createElement('button'); btn.className='button ghost'; btn.textContent='查看詳解';
-    btn.onclick=()=>openReview(orig);
-    row.append(label,btn); box.appendChild(row);
-  });
-}
-function openReview(q){
-  currentMode='review'; currentQuestion=q;
-  document.getElementById('questionText').textContent=q.question;
-  document.getElementById('realmChip').textContent=realmsMeta[q.realm].label;
-  document.getElementById('stageChip').textContent=`${q.id}｜Review`;
-  document.getElementById('conceptChip').textContent=conceptNames[q.concept]||q.concept;
-  document.getElementById('answerInput').value=''; document.getElementById('answerInput').disabled=true;
-  document.getElementById('submitBtn').classList.add('hidden'); document.getElementById('nextBtn').classList.remove('hidden');
-  document.getElementById('feedback').className='feedback ok';
-  document.getElementById('feedback').textContent=`Answer\n${q.answer}`;
-  document.getElementById('feedback').classList.remove('hidden');
-  document.getElementById('explanation').textContent=`Reasoning Path\n${q.explanation}`;
-  document.getElementById('explanation').classList.remove('hidden');
-  document.getElementById('modeNote').textContent='Review Mode｜錯題回顧';
-  showQuestionView();
-}
-function showQuestion(q, stageText){
-  currentQuestion=q;
-  document.getElementById('realmChip').textContent=realmsMeta[q.realm].label;
-  document.getElementById('stageChip').textContent=stageText;
-  document.getElementById('conceptChip').textContent=conceptNames[q.concept]||q.concept;
-  document.getElementById('questionText').textContent=q.question;
-  document.getElementById('answerInput').disabled=false; document.getElementById('answerInput').value='';
-  document.getElementById('feedback').classList.add('hidden');
-  document.getElementById('explanation').classList.add('hidden');
-  document.getElementById('submitBtn').classList.remove('hidden');
-  document.getElementById('nextBtn').classList.add('hidden');
-  document.getElementById('modeNote').textContent=currentMode==='retry'?'Wrong Question Challenge｜這是同概念新題，不是原題回放。':'';
-  renderWrongList(); renderRealmProgress(); showQuestionView();
-}
-function startRealm(realm,index=0){
-  currentRealm=realm; currentMode='normal'; currentIndex=index;
-  showQuestion(realmQuestions(realm)[index], `Stage ${index+1} / ${realmQuestions(realm).length}`);
-}
-function showQuestionView(){
-  document.getElementById('homeView').classList.add('hidden');
-  document.getElementById('questionView').classList.remove('hidden');
-}
-function backHome(){
-  document.getElementById('homeView').classList.remove('hidden');
-  document.getElementById('questionView').classList.add('hidden');
-  updateHome();
-}
-function submitAnswer(){
-  const q=currentQuestion; const val=document.getElementById('answerInput').value; const ok=isCorrect(val,q.answer);
-  const fb=document.getElementById('feedback'), ex=document.getElementById('explanation');
-  fb.className='feedback '+(ok?'ok':'err');
-  fb.textContent=ok?'Correct.\nYour mathematical insight grows.':'Not yet.\nReview the reasoning and try again.';
-  fb.classList.remove('hidden');
-  ex.textContent=`Reasoning Path\n${q.explanation}`;
-  ex.classList.remove('hidden');
-  document.getElementById('nextBtn').classList.remove('hidden');
-  if(currentMode==='review'){return;}
-  state.completed[q.id]=true;
-  if(ok) state.correct[q.id]=true; else delete state.correct[q.id];
-  if(ok){
-    if(currentMode==='retry'){ clearWrongByConcept(q.realm,q.concept); }
-  } else {
-    markWrong(q);
-  }
-  if(currentMode==='normal'){
-    state.nextIndex[q.realm]=Math.min(currentIndex+1, realmQuestions(q.realm).length-1);
-  }
-  save(); updateHome(); renderWrongList(); renderRealmProgress();
-}
-function nextStage(){
-  if(currentMode==='review'){
-    document.getElementById('answerInput').disabled=false;
-    if(reviewPayload){const {realm,index}=reviewPayload; reviewPayload=null; startRealm(realm,index);} else backHome();
-    return;
-  }
-  if(currentMode==='retry'){
-    currentMode='normal';
-    startRealm(currentRealm, returnToIndex);
-    return;
-  }
-  const arr=realmQuestions(currentRealm);
-  if(currentIndex < arr.length-1){
-    currentIndex +=1;
-    showQuestion(arr[currentIndex], `Stage ${currentIndex+1} / ${arr.length}`);
-  } else {
-    state.nextIndex[currentRealm]=arr.length-1;
-    save();
-    backHome();
-    alert('Realm Completed｜領域完成\nThe Mathematical Prince grows stronger.');
-  }
-}
-function retryWrong(){
-  const list=state.wrongs[currentRealm]||[];
-  if(!list.length){alert('目前沒有錯題可再挑戰。'); return;}
-  const item=list[0];
-  const bank=retryBank[item.concept]||[];
-  const variant=bank[Math.floor(Math.random()*bank.length)] || questions.find(q=>q.id===item.id);
-  currentMode='retry';
-  returnToIndex=Math.min(state.nextIndex[currentRealm]||0, realmQuestions(currentRealm).length-1);
-  showQuestion(variant, `Retry｜${conceptNames[item.concept]||item.concept}`);
-}
-document.getElementById('submitBtn').onclick=submitAnswer;
-document.getElementById('nextBtn').onclick=nextStage;
-document.getElementById('backHome').onclick=backHome;
-document.getElementById('retryWrongBtn').onclick=retryWrong;
-document.getElementById('answerInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!document.getElementById('submitBtn').classList.contains('hidden')) submitAnswer();});
-updateHome();
 </script>
+
 </body>
 </html>
