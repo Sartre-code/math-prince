@@ -4,195 +4,234 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>數學王子的覺醒</title>
-
 <style>
-body{
-  font-family: Arial;
-  background:#0b132b;
-  color:white;
-  margin:0;
-  padding:20px;
-}
-
-h1{
-  text-align:center;
-  margin-bottom:20px;
-}
-
-.card{
-  background:#1c2541;
-  padding:20px;
-  border-radius:16px;
-  margin-bottom:16px;
-}
-
-.button{
-  background:linear-gradient(90deg,#5f6af2,#7b5cff);
-  padding:14px;
-  border-radius:12px;
-  text-align:center;
-  margin-top:10px;
-  cursor:pointer;
-}
-
-.bar{
-  height:10px;
-  background:#3a506b;
-  border-radius:6px;
-  margin-top:6px;
-}
-.bar-inner{
-  height:10px;
-  background:#7b5cff;
-  border-radius:6px;
-  width:10%;
-}
-
+body{font-family:Arial;background:#f5f7fb;color:#1f2937;margin:0;padding:16px}
+h1{text-align:center;margin:10px 0 16px}
+.container{max-width:900px;margin:0 auto}
+.card{background:#ffffff;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 6px 16px rgba(0,0,0,0.06)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{display:block;width:100%;padding:12px;border:none;border-radius:10px;background:#4f46e5;color:#fff;font-size:16px;margin-top:8px}
+.btn.secondary{background:#0ea5e9}
+.bar{height:10px;background:#e5e7eb;border-radius:6px;margin:6px 0 10px}
+.bar>span{display:block;height:10px;background:#4f46e5;border-radius:6px;width:20%}
 #game{display:none}
-input{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-}
-button{
-  padding:12px;
-  margin-top:10px;
-}
+input{width:100%;padding:12px;border:1px solid #e5e7eb;border-radius:10px;margin-top:8px;font-size:16px}
+.small{font-size:13px;color:#6b7280}
+.row{display:flex;gap:8px}
+.row .btn{flex:1}
+.tag{display:inline-block;background:#eef2ff;color:#4f46e5;border-radius:8px;padding:4px 8px;margin-left:6px;font-size:12px}
 </style>
 </head>
 
 <body>
+<div class="container">
 
 <h1>數學王子的覺醒</h1>
 
 <div id="home">
 
 <div class="card">
-<h2>覺醒進度：0 / 60</h2>
+<h3>覺醒進度：<span id="progress">0</span> / 40</h3>
 </div>
 
 <div class="card">
-<h3>技能成長</h3>
-Reasoning
-<div class="bar"><div class="bar-inner"></div></div>
-Accuracy
-<div class="bar"><div class="bar-inner"></div></div>
-Persistence
-<div class="bar"><div class="bar-inner"></div></div>
+<h3>學習成長</h3>
+Reasoning<div class="bar"><span id="b1"></span></div>
+Accuracy<div class="bar"><span id="b2"></span></div>
+Persistence<div class="bar"><span id="b3"></span></div>
+</div>
+
+<div class="card grid">
+<button class="btn" onclick="start('fraction')">分數之域</button>
+<button class="btn" onclick="start('percentage')">百分率之域</button>
+<button class="btn" onclick="start('speed')">速率之域</button>
+<button class="btn" onclick="start('ratio')">比例與體積</button>
+<button class="btn" onclick="start('circle')">圓</button>
+<button class="btn" onclick="start('average')">平均數</button>
+<button class="btn" onclick="start('data')">資料圖表</button>
+<button class="btn" onclick="start('algebra')">代數</button>
 </div>
 
 <div class="card">
-<h3>分數之域</h3>
-<div class="button" onclick="start('fraction')">開始</div>
-</div>
-
-<div class="card">
-<h3>百分率之域</h3>
-<div class="button" onclick="start('percentage')">開始</div>
-</div>
-
-<div class="card">
-<h3>速率之域</h3>
-<div class="button" onclick="start('speed')">開始</div>
-</div>
-
-<div class="card">
-<h3>代數之域</h3>
-<div class="button" onclick="start('algebra')">開始</div>
-</div>
-
-<div class="card">
-<div class="button" onclick="reviewWrong()">錯題複習</div>
+<button class="btn secondary" onclick="reviewWrong()">錯題複習</button>
 </div>
 
 </div>
 
 <div id="game" class="card">
 <h2 id="q"></h2>
-
 <input id="answer" placeholder="輸入答案">
-
-<button onclick="submit()">提交</button>
-<button onclick="next()">下一題</button>
-
+<div class="row">
+<button class="btn" onclick="submit()">提交</button>
+<button class="btn" onclick="next()">下一題</button>
+</div>
 <p id="result"></p>
-<p id="explain"></p>
+<p id="explain" class="small"></p>
+</div>
+
 </div>
 
 <script>
+// ---------- 共用 ----------
+let current=0, list=[], wrong=[], score=0;
 
-let current=0
-let list=[]
-let wrong=[]
+function norm(v){
+  v=v.toString().trim().toLowerCase();
+  v=v.replace(/\s+/g,'');
+  // 混合數 1 1/2 -> 1.5
+  if(/^\d+\d+\/\d+$/.test(v)){
+    let a=v.match(/^(\d+)(\d+)\/(\d+)$/);
+    v=(+a[1])+(+a[2])/(+a[3]);
+  }
+  // 分數 -> 小數
+  if(/^\d+\/\d+$/.test(v)){
+    let a=v.split('/');
+    v=(+a[0])/(+a[1]);
+  }
+  return v;
+}
 
-const qbank={
-fraction:[
-{q:"媽媽做蛋糕切成8份，吃3/8與1/4，共吃多少?",a:["5/8","0.625"],e:"通分"},
-],
-percentage:[
-{q:"原價200打8折多少?",a:["160"],e:"×0.8"},
-],
-speed:[
-{q:"距離120km用2小時，速率?",a:["60"],e:"除"},
-],
-algebra:[
-{q:"金幣花一半再花30剩50，原本金幣?",a:["160"],e:"設x"},
-]
+function eq(val, answers){
+  val=norm(val);
+  let arr=answers.map(norm);
+  // 多答案（用逗號或頓號分隔）
+  if(val.includes(',')||val.includes('、')){
+    let parts=val.split(/,|、/).map(norm).sort().join('|');
+    let ok=answers.map(x=>{
+      let p=x.toString().split(/,|、/).map(norm).sort().join('|');
+      return p;
+    });
+    return ok.includes(parts);
+  }
+  return arr.includes(val);
+}
+
+function setBars(){
+  document.getElementById('b1').style.width=(20+score*2)+'%';
+  document.getElementById('b2').style.width=(20+score*2)+'%';
+  document.getElementById('b3').style.width=(20+score*2)+'%';
+  document.getElementById('progress').innerText=score;
 }
 
 function start(type){
-list=qbank[type]
-current=0
-home.style.display="none"
-game.style.display="block"
-show()
+  list=qbank[type];
+  current=0;
+  document.getElementById('home').style.display='none';
+  document.getElementById('game').style.display='block';
+  show();
 }
 
 function show(){
-q.innerText=list[current].q
-answer.value=""
-result.innerText=""
-explain.innerText=""
-}
-
-function normalize(v){
-return v.replace(/\s/g,'').toLowerCase()
+  let q=list[current];
+  document.getElementById('q').innerHTML=q.q;
+  answer.value='';
+  result.innerText='';
+  explain.innerText='';
 }
 
 function submit(){
-let val=normalize(answer.value)
-let correct=list[current].a.map(normalize)
-
-if(correct.includes(val)){
-result.innerText="✅ 正確"
-}else{
-result.innerText="❌ 錯誤"
-explain.innerText=list[current].e
-wrong.push(list[current])
-}
+  let val=answer.value;
+  let q=list[current];
+  if(eq(val,q.a)){
+    result.innerText='✅ 正確';
+    score++; setBars();
+  }else{
+    result.innerText='❌ 錯誤';
+    explain.innerText=q.e;
+    wrong.push(q);
+  }
 }
 
 function next(){
-current++
-if(current>=list.length){
-alert("完成")
-location.reload()
-}else show()
+  current++;
+  if(current>=list.length){
+    alert('完成本單元');
+    document.getElementById('game').style.display='none';
+    document.getElementById('home').style.display='block';
+  }else show();
 }
 
 function reviewWrong(){
-if(wrong.length==0){
-alert("目前沒有錯題")
-return
-}
-list=wrong
-current=0
-home.style.display="none"
-game.style.display="block"
-show()
+  if(wrong.length===0){ alert('目前沒有錯題'); return; }
+  // 同概念新題：用對應池
+  list=wrong.map(q=> (q.alt && q.alt.length)? q.alt[Math.floor(Math.random()*q.alt.length)] : q );
+  current=0;
+  document.getElementById('home').style.display='none';
+  document.getElementById('game').style.display='block';
+  show();
 }
 
+// ---------- 題庫（40題，5題×8單元） ----------
+const qbank={
+
+fraction:[
+{q:"蛋糕切成 8 份，吃了 3/8 又吃 1/4，共吃多少？",a:["5/8","0.625"],e:"通分 3/8+2/8=5/8",
+ alt:[{q:"一條巧克力吃了 1/2 又吃 1/6，共吃多少？",a:["2/3","0.6667"],e:"3/6+1/6=4/6=2/3"}]},
+{q:"1 − 2/5 = ?",a:["3/5","0.6"],e:"1=5/5"},
+{q:"2/3 × 3/4 = ?",a:["1/2","0.5"],e:"約分"},
+{q:"哪個較大：2/3 或 3/5？（輸入 2/3 或 3/5）",a:["2/3"],e:"交叉比較"},
+{q:"把 120 元按 2:3 分，兩份各多少？（用 48,72）",a:["48,72","72,48"],e:"總5份→每份24"}
+],
+
+percentage:[
+{q:"原價 200 打 8 折，售價？",a:["160"],e:"×0.8"},
+{q:"50 增加 20% 變多少？",a:["60"],e:"×1.2"},
+{q:"80 是 100 的幾 %？",a:["80%","0.8"],e:"80/100"},
+{q:"100 先降 10% 再升 10%，結果？",a:["99"],e:"100→90→99"},
+{q:"某商品原價 x，打 75 折後為 150，x=?",a:["200"],e:"0.75x=150"}
+],
+
+speed:[
+{q:"120 公里用 2 小時，速率？(km/h)",a:["60"],e:"距離/時間"},
+{q:"小明 1.5 小時走 6 公里，速率？",a:["4"],e:"6/1.5"},
+{q:"兩人同向：甲 60、乙 45，1 小時相距多少？",a:["15"],e:"差速"},
+{q:"去程 40 km/h，回程 60 km/h，平均速率？",a:["48"],e:"2ab/(a+b)"},
+{q:"距離 90 公里，速率 30，時間？(hr)",a:["3"],e:"距離/速率"}
+],
+
+ratio:[
+{q:"把 100 按 2:3 分，兩份各多少？（用 40,60）",a:["40,60","60,40"],e:"總5份"},
+{q:"水箱 50×40×30 cm，體積？(cm³)",a:["60000"],e:"長寬高"},
+{q:"果汁:水=1:4，共 250 ml，果汁多少？",a:["50"],e:"5份→每份50"},
+{q:"比例 3:5，若總為 64，兩份各多少？（用 24,40）",a:["24,40","40,24"],e:"8份"},
+{q:"把 180 依 1:2:3 分，三份？（用 30,60,90）",a:["30,60,90"],e:"6份→每份30"}
+],
+
+circle:[
+{q:"直徑 10（π=3.14），周長？",a:["31.4"],e:"πd"},
+{q:"半徑 7（π=22/7），周長？",a:["44"],e:"2πr"},
+{q:"半徑倍增，周長變？（輸入 2倍）",a:["2倍"],e:"成正比"},
+{q:"周長 62.8（π=3.14），半徑？",a:["10"],e:"2πr"},
+{q:"跑道直徑 28（π=22/7），1 圈距離？",a:["88"],e:"πd"}
+],
+
+average:[
+{q:"(10+20+30)/3=?",a:["20"],e:"平均"},
+{q:"5 人平均 80，總分？",a:["400"],e:"×人數"},
+{q:"原 4 人平均 70，加入 1 人後平均 74，新同學幾分？",a:["90"],e:"總差法"},
+{q:"三組平均：A(4人72)、B(6人78)，合併平均？",a:["75.6"],e:"加權"},
+{q:"平均 80，共 5 人，移除一人後平均 78，被移除者？",a:["88"],e:"反推"}
+],
+
+data:[
+{q:"銷量：80、120、100、140、160，平均？",a:["120"],e:"總/5"},
+{q:"上題哪天比平均多最多？（輸入 160）",a:["160"],e:"與120比較"},
+{q:"讀書時數：2→3→5→4→6，增加最多的是？（輸入 3或5）",a:["3","5","星期三","星期五"],e:"+2 出現兩次"},
+{q:"交通：走6、公9、騎5，共幾人？公車占幾%？（用 20% 或 0.45）",a:["45%","0.45"],e:"9/20"},
+{q:"三天距離/時間：30/2、45/3、60/4，平均速率？",a:["15"],e:"總距/總時"}
+],
+
+algebra:[
+{q:"3x+2(x+10)=140，x=?",a:["24"],e:"5x+20=140"},
+{q:"(x+5)×4−8=60，x=?",a:["12"],e:"回推"},
+{q:"果汁:水=2:3，加 30 ml 水後變 2:5，原總量？",a:["75"],e:"設2x,3x"},
+{q:"哥哥比弟弟大6，4年後為2倍，哥哥現在？",a:["8"],e:"方程"},
+{q:"金幣先花1/3再花剩下1/2，最後剩40，原本？",a:["120"],e:"連續比例"}
+]
+
+};
+
+setBars();
 </script>
-
 </body>
 </html>
